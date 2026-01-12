@@ -28,7 +28,7 @@ jobs:
       - name: Send Teams Notification on Deployment Failure
         if: steps.deploy.outcome == 'failure'
         run: |
-          curl -X POST  "${{ secrets.TEAMS_WEBHOOK_URL }}" \ -H "Content-Type: application/json" \
+          curl -X POST  "${{ secrets.TEAMS_WEBHOOK_URL }}"  -H "Content-Type: application/json" \
             -d '{
               "@type": "MessageCard",
               "@context": "https://schema.org/extensions",
