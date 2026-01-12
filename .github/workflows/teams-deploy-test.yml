@@ -18,7 +18,7 @@ jobs:
 
       # Simulated deployment step (INTENTIONAL FAILURE)
       - name: Simulate deployment failure
-        id: deploy
+        id: maven_test
         run: |
           echo "Simulating deployment..."
           exit 1
@@ -26,21 +26,21 @@ jobs:
 
        # Teams notification on deployment failure
       - name: Send Teams Notification on Deployment Failure
-        if: steps.deploy.outcome == 'failure'
+        if: steps.maven_test.outcome == 'failure'
         run: |
           curl -X POST  "${{ secrets.TEAMS_WEBHOOK_URL }}"  -H "Content-Type: application/json" \
             -d '{
               "@type": "MessageCard",
               "@context": "https://schema.org/extensions",
               "themeColor": "FF0000",
-              "title": "❌ Deployment Failed",
+              "title": "Test Failed",
               "sections": [{
-                "text": "**Project:** '"$PROJECT_NAME"'\n\n**Environment:** '"$ENV_NAME"'\n\n**Message:** Deployment failed (manual test)."
+                "text": "**Project:** '"$PROJECT_NAME"'\n\n**Environment:** '"$ENV_NAME"'\n\n**Message:** Test failed (manual trigger)."
               }]
             }'
            
 
       # Fail the workflow so it shows ❌
       - name: Fail workflow
-        if: steps.deploy.outcome == 'failure'
+        if: steps.maven_test.outcome == 'failure'
         run: exit 1
