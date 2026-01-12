@@ -1,0 +1,46 @@
+name: Teams Deployment Test (Manual)
+
+on: [workflow_dispatch]
+
+env:
+  PROJECT_NAME: ${{ github.event.repository.name }}
+  ENV_NAME: ${{ github.ref_name }}
+
+jobs:
+  deploy-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Show project & environment
+        run: |
+          echo "Project      : $PROJECT_NAME"
+          echo "Environment  : $ENV_NAME"
+
+      # Simulated deployment step (INTENTIONAL FAILURE)
+      - name: Simulate deployment failure
+        id: deploy
+        run: |
+          echo "Simulating deployment..."
+          exit 1
+        continue-on-error: true
+
+      # Teams notification on deployment failure
+      - name: Send Teams Notification on Deployment Failure
+        if: steps.deploy.outcome == 'failure'
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "@type": "MessageCard",
+              "@context": "https://schema.org/extensions",
+              "themeColor": "FF0000",
+              "title": "❌ Deployment Failed",
+              "sections": [{
+                "text": "**Project:** '"$PROJECT_NAME"'\n\n**Environment:** '"$ENV_NAME"'\n\n**Message:** Deployment failed (manual test)."
+              }]
+            }' \
+            ${{ secrets.TEAMS_WEBHOOK_URL }}
+
+      # Fail the workflow so it shows ❌
+      - name: Fail workflow
+        if: steps.deploy.outcome == 'failure'
+        run: exit 1
