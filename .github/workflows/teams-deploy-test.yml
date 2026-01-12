@@ -24,11 +24,11 @@ jobs:
           exit 1
         continue-on-error: true
 
-      # Teams notification on deployment failure
+       # Teams notification on deployment failure
       - name: Send Teams Notification on Deployment Failure
         if: steps.deploy.outcome == 'failure'
         run: |
-          curl -X " ${{ secrets.TEAMS_WEBHOOK_URL }}"  -H "Content-Type: application/json" \
+          curl -X POST  "${{ secrets.TEAMS_WEBHOOK_URL }}"  -H "Content-Type: application/json" \
             -d '{
               "@type": "MessageCard",
               "@context": "https://schema.org/extensions",
@@ -37,7 +37,7 @@ jobs:
               "sections": [{
                 "text": "**Project:** '"$PROJECT_NAME"'\n\n**Environment:** '"$ENV_NAME"'\n\n**Message:** Deployment failed (manual test)."
               }]
-            }' 
+            }'
            
 
       # Fail the workflow so it shows ❌
